@@ -1,0 +1,7 @@
+.idea
+*.swp
+*.pyc
+*.spx
+*.wav
+*.config
+*.exe
