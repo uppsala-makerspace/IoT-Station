@@ -19,8 +19,13 @@ def setup(channel, state, initial=-1, pull_up_down=-1):
     print "setup: " + str(channel) + " " + str(state)
 
 
-def add_event_detect (channel, edge, callback, bouncetime):
+def add_event_detect(channel, edge, callback, bouncetime):
     print "add event detect: " + str(channel) + " " + str(edge)
+
+
+def output(pin, value):
+    """"""
+    #print "output: " + str(pin) + " = " + str(value)
 
 
 def cleanup():

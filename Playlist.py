@@ -31,7 +31,8 @@ class PlaybackControls:
         """Play the current message"""
         m = self.playlist[0]
 
-        self.t = Timer(3.0, self.play_next)
+        # TODO: add proper audio length
+        self.t = Timer(3.0 + Config.sensor_message_delay, self.play_next)
         self.t.start()
 
         Audio.control.play_sound(get_filename(m.messageId))

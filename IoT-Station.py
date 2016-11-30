@@ -3,7 +3,6 @@ import Votes
 import Audio
 import Playlist
 import Raspberry
-import time
 import sys
 
 
@@ -15,11 +14,12 @@ def main():
     ServerCommunication.get_playlist()
     Playlist.control.play()
 
+    # start the vote submit timer
+    Votes.post_votes()
+
     Raspberry.setup()
 
-#   TODO: need to periodically call post_votes
-    # ServerCommunication.post_votes()
-    # print Votes.get_json()
+    # Raspberry.record_callback()
 
     while 1:
         """"""

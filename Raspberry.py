@@ -8,16 +8,14 @@ import Config
 import Votes
 import ServerCommunication
 import atexit
-from threading import Timer
 import threading
+import LED
 
 
 PLAY_PIN        = 11
 RECORD_PIN      = 11
 VOTE_UP_PIN     = 11
 VOTE_DOWN_PIN   = 11
-
-NUMBER_OF_LEDS  = 16
 
 
 class State:
@@ -51,9 +49,10 @@ class RecordThread (threading.Thread):
 
         Audio.control.start_recording(Config.data_path + "/rec.wav")
 
-        for i in range(0, NUMBER_OF_LEDS-1):
-            print "LED: " + str(i)  # TODO: add actual led driving code here!
-            time.sleep(float(Config.recording_time)/NUMBER_OF_LEDS)
+        leds = LED.CountDown()
+        for i in range(0, LED.NUMBER_OF_LEDS-1):
+            leds.tick()
+            time.sleep(float(Config.recording_time)/LED.NUMBER_OF_LEDS)
 
         Audio.control.stop_recording()
         ServerCommunication.post_audio_message(Config.data_path + "/rec")

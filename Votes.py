@@ -1,6 +1,8 @@
 import json
 import JSONEncoderExt
-
+from threading import Timer
+import Config
+import ServerCommunication
 
 class Vote:
     messageId = ""
@@ -28,3 +30,11 @@ def clear_votes():
 def get_json():
     # return json.dumps(votes, cls=JSONEncoderExt.ComplexEncoder, indent=4, separators=(',', ': '))
     return json.dumps(votes, cls=JSONEncoderExt.ComplexEncoder)
+
+
+def post_votes():
+    # submit votes every X seconds, default every 2 minutes
+    t = Timer(Config.vote_post_frequency, post_votes())
+    t.start()
+    ServerCommunication.post_votes()
+
