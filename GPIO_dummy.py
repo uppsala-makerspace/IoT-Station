@@ -1,3 +1,5 @@
+import logging
+log = logging.getLogger("GPIO_dummy")
 
 LOW = 0
 HIGH = 1
@@ -12,22 +14,21 @@ FALLING = 9
 
 
 def setmode(mode):
-    print "set mode: " + str(mode)
+    log.debug("set mode: " + str(mode))
 
 
 def setup(channel, state, initial=-1, pull_up_down=-1):
-    print "setup: " + str(channel) + " " + str(state)
+    log.debug("setup: " + str(channel) + " " + str(state))
 
 
 def add_event_detect(channel, edge, callback, bouncetime):
-    print "add event detect: " + str(channel) + " " + str(edge)
+    log.debug("add event detect: " + str(channel) + " " + str(edge))
 
 
 def output(pin, value):
-    """"""
-    #print "output: " + str(pin) + " = " + str(value)
+    log.debug("output: " + str(pin) + " = " + str(value))
 
 
 def cleanup():
-    print "cleanup"
+    log.info("cleanup")
 

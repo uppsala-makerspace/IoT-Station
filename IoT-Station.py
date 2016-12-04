@@ -1,12 +1,17 @@
+import Config
 import ServerCommunication
 import Votes
 import Audio
 import Playlist
 import Raspberry
 import sys
+import logging
+log = logging.getLogger("main")
 
 
 def main():
+    print ("Starting IoT-Station version: " + Config.version)
+
     # say hello
     ServerCommunication.ping_server()
 
@@ -31,7 +36,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print 'Interrupted'
+        log.warn("Interrupted by keyboard")
         Audio.control.stop_sound()
         Playlist.control.stop()
         sys.exit(0)

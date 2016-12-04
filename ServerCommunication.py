@@ -1,16 +1,19 @@
 import requests
-import base64
 import Config
 import Votes
 import Playlist
 import Speex
+
+import logging
+log = logging.getLogger("ServerCommunication")
 
 
 def ping_server():
     """Ping the server"""
     headers = {'X-Station-ID': Config.station_id}
     req = requests.get(Config.server_url + 'api/v1/ping', headers=headers)
-    print req.text
+
+    log.debug(req.text)
 
 
 def post_audio_message(filename):
@@ -21,7 +24,7 @@ def post_audio_message(filename):
     data = {'base64Data': base64data, 'mimeType': 'audio/x-speex'}
 
     req = requests.post(Config.server_url + 'api/v1/message', headers=headers, json=data)
-    print req.text
+    log.debug(req.text)
 
 
 def post_votes():
@@ -30,12 +33,12 @@ def post_votes():
 
     # no votes stored!
     if len(Votes.votes) == 0:
-        print "No votes to upload"
+        log.info("No votes to upload")
         return
 
     req = requests.post(Config.server_url + 'api/v1/vote', headers=headers, data=Votes.get_json())
 
-    print req.text
+    log.debug(req.text)
 
     # delete the votes
     Votes.clear_votes()

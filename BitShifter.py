@@ -5,7 +5,7 @@ except ImportError:
 
 RCLK_PIN    = 25
 SRCLK_PIN   = 24
-SERIAL_PIN     = 23
+SERIAL_PIN  = 23
 
 
 class BitShifter:

@@ -1,6 +1,8 @@
 import pyaudio
 import wave
 import threading
+import logging
+log = logging.getLogger("Audio")
 
 p = pyaudio.PyAudio()
 CHUNK = 1024
@@ -20,7 +22,7 @@ class AudioControl:
         self.play_thread.start()
 
     def start_recording(self, filename):
-        print "Start recording"
+        log.info("Start recording")
         self.stop_sound()
 
         rate = 22050
@@ -41,7 +43,7 @@ class AudioControl:
         self._stream.stop_stream()
         self._stream.close()
         self._recFile.close()
-        print "Recording done!"
+        log.info("Recording done!")
 
     def get_callback(self):
         def callback(in_data, frame_count, time_info, status):
@@ -57,7 +59,7 @@ class AudioThread (threading.Thread):
         self.stop = False
 
     def run(self):
-        # print "Starting audio thread: " + self.filename
+        log.debug("Starting audio thread: " + self.filename)
         wf = wave.open(self.filename + ".wav", 'rb')
 
         stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
@@ -73,6 +75,6 @@ class AudioThread (threading.Thread):
 
         stream.stop_stream()
         stream.close()
-        # print "Exiting audio thread: " + self.filename
+        log.debug("Exiting audio thread: " + self.filename)
 
 control = AudioControl()
