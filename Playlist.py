@@ -32,18 +32,27 @@ class PlaybackControls:
 
     def play(self):
         """Play the current message"""
-        if len(self.playlist) is 0:
-            log.error("Playlist is empty!")
-            return
+        if len(self.playlist) is not 0:
+            m = self.playlist[0]
+            Audio.control.play_sound(get_filename(m.messageId))
+            log.info("Playing " + m.messageId + " (" + str(m.length) + "s)")
 
-        m = self.playlist[0]
+            # TODO: add proper audio length
+            self.t = Timer(3.0 + Config.sensor_message_delay, self.play_next)
+            self.t.start()
+        else:
+            log.error("Playlist is empty.")
 
-        # TODO: add proper audio length
-        self.t = Timer(3.0 + Config.sensor_message_delay, self.play_next)
-        self.t.start()
+            if len(control.emergency_playlist) is not 0:
+                log.warn("Using emergency list!")
+                control.playlist = control.emergency_playlist[:]
+                self.play()
+            else:
+                log.error("Emergency playlist is empty too!")
+                log.debug("Trying again in %d seconds...", Config.sensor_message_delay)
+                self.t = Timer(Config.sensor_message_delay, self.play)
+                self.t.start()
 
-        Audio.control.play_sound(get_filename(m.messageId))
-        log.info("Playing " + m.messageId + " (" + str(m.length) + "s)")
 
     def play_next(self):
         """Play the next message"""
@@ -101,7 +110,7 @@ def remove_first_voice_message():
     if len(control.playlist) < MIN_MESSAGES_IN_PLAYLIST:
         ServerCommunication.get_playlist()  # get more messages
 
-    elif len(control.playlist) == 0:
+    elif len(control.playlist) is 0:
         # end of list! Not good...
         log.warn("Playlist is empty, using emergency list!")
         control.playlist = control.emergency_playlist[:]

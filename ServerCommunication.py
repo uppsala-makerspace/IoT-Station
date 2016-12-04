@@ -3,6 +3,7 @@ import Config
 import Votes
 import Playlist
 import Speex
+from threading import Timer
 
 import logging
 log = logging.getLogger("ServerCommunication")
@@ -30,6 +31,9 @@ def post_audio_message(filename):
         req = requests.post(Config.server_url + 'api/v1/message', headers=headers, json=data)
         log.debug(req.text)
     except requests.ConnectionError as e:
+        # TODO: currently we'll lose this message if we can't get to the server!
+        # Should we cache it and try again later?
+
         log.error("Failed to post audio message!")
         log.debug(e)
 
@@ -71,3 +75,9 @@ def get_playlist():
         log.error("Failed to get playlist!")
         log.debug(e)
 
+        # If the current playlist is empty, we have to schedule
+        # another try at getting it from the server.
+        if len(Playlist.control.playlist) is 0:
+            log.error("Playlist is empty! Trying again in 30 seconds...")
+            t = Timer(30, get_playlist)
+            t.start()
