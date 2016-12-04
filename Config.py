@@ -7,9 +7,9 @@ config.read("station.config")
 station_id = config.get("Config", "id")
 server_url = config.get("Config", "server")
 data_path = config.get("Config", "data_path")
-recording_time = config.get("Config", "recording_time")
-sensor_message_delay = config.get("Config", "sensor_message_delay")
-vote_post_frequency = config.get("Config", "vote_post_frequency")
+recording_time = config.getfloat("Config", "recording_time")
+sensor_message_delay = config.getfloat("Config", "sensor_message_delay")
+vote_post_frequency = config.getfloat("Config", "vote_post_frequency")
 
 # create data dir if it doesn't already exist
 try:

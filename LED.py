@@ -1,4 +1,8 @@
-import GPIO_dummy as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    import GPIO_dummy as GPIO
+
 from BitShifter import BitShifter
 from threading import Timer
 

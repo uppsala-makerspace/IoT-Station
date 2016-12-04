@@ -1,4 +1,7 @@
-import GPIO_dummy as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    import GPIO_dummy as GPIO
 
 RCLK_PIN    = 25
 SRCLK_PIN   = 24

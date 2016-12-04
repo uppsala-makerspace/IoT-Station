@@ -1,6 +1,9 @@
 
-# import RPi.GPIO as GPIO
-import GPIO_dummy as GPIO  # dummy GPIO for development off board
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    import GPIO_dummy as GPIO  # dummy GPIO for development off board
+
 import Playlist
 import Audio
 import time
@@ -85,18 +88,29 @@ def vote_down_callback():
     Votes.add_vote("922ae72c-1862-4d91-a08b-4f2738ad0354", False)
 
 
+def button_callback(pin):
+    if pin is PLAY_PIN:
+        play_callback()
+    elif pin is RECORD_PIN:
+        record_callback()
+    elif pin is VOTE_DOWN_PIN:
+        vote_down_callback()
+    elif pin is VOTE_UP_PIN:
+        vote_up_callback()
+
+
 def setup():
     GPIO.setmode(GPIO.BCM)
 
-    GPIO.setup(PLAY_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(RECORD_PIN,      GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(VOTE_UP_PIN,     GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(VOTE_DOWN_PIN,   GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(PLAY_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(RECORD_PIN,      GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(VOTE_UP_PIN,     GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(VOTE_DOWN_PIN,   GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-    GPIO.add_event_detect(PLAY_PIN,         GPIO.FALLING, callback=play_callback,       bouncetime=200)
-    GPIO.add_event_detect(RECORD_PIN,       GPIO.FALLING, callback=record_callback,     bouncetime=200)
-    GPIO.add_event_detect(VOTE_UP_PIN,      GPIO.FALLING, callback=vote_up_callback,    bouncetime=200)
-    GPIO.add_event_detect(VOTE_DOWN_PIN,    GPIO.FALLING, callback=vote_down_callback,  bouncetime=200)
+    GPIO.add_event_detect(PLAY_PIN,         GPIO.RISING, callback=button_callback,  bouncetime=200)
+    GPIO.add_event_detect(RECORD_PIN,       GPIO.RISING, callback=button_callback,  bouncetime=200)
+    GPIO.add_event_detect(VOTE_UP_PIN,      GPIO.RISING, callback=button_callback,  bouncetime=200)
+    GPIO.add_event_detect(VOTE_DOWN_PIN,    GPIO.RISING, callback=button_callback,  bouncetime=200)
 
     state.value = State.CITY_VOICE
 

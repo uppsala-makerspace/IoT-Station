@@ -34,7 +34,7 @@ def get_json():
 
 def post_votes():
     # submit votes every X seconds, default every 2 minutes
-    t = Timer(Config.vote_post_frequency, post_votes())
+    t = Timer(Config.vote_post_frequency, post_votes)
     t.start()
     ServerCommunication.post_votes()
 

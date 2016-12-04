@@ -7,7 +7,7 @@ PUD_OFF = 4
 PUD_DOWN = 5
 PUD_UP = 6
 BCM = 7
-RAISING = 8
+RISING = 8
 FALLING = 9
 
 
