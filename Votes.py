@@ -3,6 +3,9 @@ import JSONEncoderExt
 from threading import Timer
 import Config
 import ServerCommunication
+import logging
+log = logging.getLogger("Votes")
+
 
 class Vote:
     messageId = ""
@@ -24,6 +27,7 @@ def add_vote(message_id, is_upvote):
 
 
 def clear_votes():
+    log.info("Clearing votes array")
     del votes[:]
 
 

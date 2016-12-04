@@ -11,9 +11,12 @@ log = logging.getLogger("ServerCommunication")
 def ping_server():
     """Ping the server"""
     headers = {'X-Station-ID': Config.station_id}
-    req = requests.get(Config.server_url + 'api/v1/ping', headers=headers)
-
-    log.debug(req.text)
+    try:
+        req = requests.get(Config.server_url + 'api/v1/ping', headers=headers)
+        log.debug(req.text)
+    except requests.ConnectionError as e:
+        log.error("No ping response!")
+        log.debug(e)
 
 
 def post_audio_message(filename):
@@ -23,8 +26,12 @@ def post_audio_message(filename):
     base64data = Speex.encode(filename)
     data = {'base64Data': base64data, 'mimeType': 'audio/x-speex'}
 
-    req = requests.post(Config.server_url + 'api/v1/message', headers=headers, json=data)
-    log.debug(req.text)
+    try:
+        req = requests.post(Config.server_url + 'api/v1/message', headers=headers, json=data)
+        log.debug(req.text)
+    except requests.ConnectionError as e:
+        log.error("Failed to post audio message!")
+        log.debug(e)
 
 
 def post_votes():
@@ -36,12 +43,15 @@ def post_votes():
         log.info("No votes to upload")
         return
 
-    req = requests.post(Config.server_url + 'api/v1/vote', headers=headers, data=Votes.get_json())
+    try:
+        req = requests.post(Config.server_url + 'api/v1/vote', headers=headers, data=Votes.get_json())
+        log.debug(req.text)
 
-    log.debug(req.text)
-
-    # delete the votes
-    Votes.clear_votes()
+        # delete the votes after they've been properly sent
+        Votes.clear_votes()
+    except requests.ConnectionError as e:
+        log.error("Failed to post votes!")
+        log.debug(e)
 
 
 def get_playlist():
@@ -49,10 +59,15 @@ def get_playlist():
     headers = {'X-Station-ID': Config.station_id}
     params = {'amount': 4}  # TODO: only requesting 4 voice messages right now, should be more!
 
-    req = requests.get(Config.server_url + 'api/v1/playlist', headers=headers, params=params)
+    try:
+        req = requests.get(Config.server_url + 'api/v1/playlist', headers=headers, params=params)
 
-    for m in req.json():
-        Playlist.add_voice_message(m)
+        for m in req.json():
+            Playlist.add_voice_message(m)
 
-    Playlist.playlist_updated()
-    # print json.dumps(req.json(), sort_keys=True, indent=4, separators=(',', ': '))
+        Playlist.playlist_updated()
+        # print json.dumps(req.json(), sort_keys=True, indent=4, separators=(',', ': '))
+    except requests.ConnectionError as e:
+        log.error("Failed to get playlist!")
+        log.debug(e)
+

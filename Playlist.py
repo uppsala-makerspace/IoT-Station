@@ -32,6 +32,10 @@ class PlaybackControls:
 
     def play(self):
         """Play the current message"""
+        if len(self.playlist) is 0:
+            log.error("Playlist is empty!")
+            return
+
         m = self.playlist[0]
 
         # TODO: add proper audio length
