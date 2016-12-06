@@ -15,18 +15,20 @@ import threading
 import LED
 
 
-PLAY_PIN        = 11
-RECORD_PIN      = 11
-VOTE_UP_PIN     = 11
-VOTE_DOWN_PIN   = 11
+PLAY_PIN = 11
+RECORD_PIN = 12
+VOTE_UP_PIN = 15
+VOTE_DOWN_PIN = 14
 
 
 class State:
-    NONE            = 0
-    CITY_VOICE      = 1
-    USER_VOICE      = 2
-    RECORDING       = 3
-    value = NONE
+    NONE = 0
+    CITY_VOICE = 1
+    USER_VOICE = 2
+    RECORDING = 3
+
+    def __init__(self):
+        self.value = State.NONE
 
 state = State()
 

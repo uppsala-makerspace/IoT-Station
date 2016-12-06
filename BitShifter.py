@@ -3,15 +3,20 @@ try:
 except ImportError:
     import GPIO_dummy as GPIO
 
-RCLK_PIN    = 25
-SRCLK_PIN   = 24
-SERIAL_PIN  = 23
+
+RCLK_PIN = 25
+SRCLK_PIN = 24
+SERIAL_PIN = 23
 
 
 class BitShifter:
     def __init__(self, number_of_bits=8):
         self.numberOfBits = number_of_bits
         self.bits = list()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(RCLK_PIN, GPIO.OUT)
+        GPIO.setup(SRCLK_PIN, GPIO.OUT)
+        GPIO.setup(SERIAL_PIN, GPIO.OUT)
         self.set_all(GPIO.LOW)
 
     def set_all(self, mode, now=True):
