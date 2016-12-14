@@ -31,6 +31,7 @@ class BlinkAll:
 
     def tick(self):
         if self.cancelled is True:
+            array.set_all(GPIO.LOW)
             return
 
         if self.on:
