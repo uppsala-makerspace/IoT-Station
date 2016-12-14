@@ -15,10 +15,10 @@ import threading
 import LED
 
 
-PLAY_PIN = 11
-RECORD_PIN = 12
-VOTE_UP_PIN = 15
-VOTE_DOWN_PIN = 14
+PLAY_PIN = 17
+RECORD_PIN = 18
+VOTE_UP_PIN = 22
+VOTE_DOWN_PIN = 27
 
 
 class State:
@@ -52,7 +52,7 @@ class RecordThread (threading.Thread):
         state.value = State.RECORDING
         Playlist.control.stop()
 
-        Audio.control.start_recording(Config.data_path + "/rec.wav")
+        Audio.control.start_recording(Config.data_path + "/rec")
 
         leds = LED.CountDown()
         for i in range(0, LED.NUMBER_OF_LEDS-1):
@@ -78,7 +78,7 @@ def vote_up_callback():
     if state.value is not State.USER_VOICE:
         return
 
-#   TODO: need proper id of playing audio here
+    #   TODO: need proper id of playing audio here
     Votes.add_vote("922ae72c-1862-4d91-a08b-4f2738ad0354", True)
 
 
@@ -86,7 +86,7 @@ def vote_down_callback():
     if state.value is not State.USER_VOICE:
         return
 
-#   TODO: need proper id of playing audio here
+    #   TODO: need proper id of playing audio here
     Votes.add_vote("922ae72c-1862-4d91-a08b-4f2738ad0354", False)
 
 

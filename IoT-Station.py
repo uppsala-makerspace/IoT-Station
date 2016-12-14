@@ -34,13 +34,4 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        log.warn("Interrupted by keyboard")
-        Audio.control.stop_sound()
-        Playlist.control.stop()
-        sys.exit(0)
-
-
-
+    main()
