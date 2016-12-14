@@ -1,75 +1,103 @@
-import pyaudio
+import alsaaudio
 import wave
 import logging
+import threading
 log = logging.getLogger("Audio")
 
-p = pyaudio.PyAudio()
 CHUNK = 1024
 
 
 class AudioControl:
     def __init__(self):
+        self.audio_thread = AudioThread("")
         self._stream = None
         self._wf = None
 
     def stop_sound(self):
-        if self._stream is not None:
-            self._stream.stop_stream()
-            self._stream.close()
-        self._wf.close()
+        self.audio_thread.stop = True
         log.info("Playing done!")
 
     def play_sound(self, filename):
         log.info("Start playing: " + filename)
 
-        if self._stream is not None and self._stream.is_active():
-            self.stop_sound()
-
-        self._wf = wave.open(filename + ".wav", 'rb')
-
-        self._stream = p.open(format=p.get_format_from_width(self._wf.getsampwidth()),
-                              channels=self._wf.getnchannels(),
-                              rate=self._wf.getframerate(),
-                              output=True,
-                              stream_callback=self.get_callback_play())
-        # self._stream.start_stream()
-
-    def get_callback_play(self):
-        def callback(in_data, frame_count, time_info, status):
-            data = self._wf.readframes(frame_count)
-            return data, pyaudio.paContinue
-        return callback
+        self.audio_thread = AudioThread(filename)
+        self.audio_thread.start()
 
     def start_recording(self, filename):
         log.info("Start recording")
         self.stop_sound()
-
-        rate = 22050
-        self._wf = wave.open(filename, 'wb')
-        self._wf.setnchannels(1)
-        self._wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-        self._wf.setframerate(rate)
-
-        self._stream = p.open(format=pyaudio.paInt16,
-                              channels=1,
-                              rate=rate,
-                              input=True,
-                              frames_per_buffer=CHUNK,
-                              stream_callback=self.get_callback_record())
-        # self._stream.start_stream()
+        self.audio_thread = AudioThread(filename, False)
+        self.audio_thread.start()
 
     def stop_recording(self):
-        if self._stream is not None:
-            self._stream.stop_stream()
-            self._stream.close()
-        self._wf.close()
+        self.stop_sound()
         log.info("Recording done!")
 
-    def get_callback_record(self):
-        def callback(in_data, frame_count, time_info, status):
-            self._wf.writeframes(in_data)
-            return in_data, pyaudio.paContinue
-        return callback
+
+class AudioThread (threading.Thread):
+    def __init__(self, filename, play=True):
+        threading.Thread.__init__(self)
+        self.filename = filename
+        self.stop = False
+        self.play = play
+
+    def run(self):
+        log.debug("Starting audio thread: " + self.filename)
+
+        if self.play is True:
+            wf = wave.open(self.filename + ".wav", 'rb')
+
+            # Set attributes
+            device = alsaaudio.PCM()
+            device.setchannels(wf.getnchannels())
+            device.setrate(wf.getframerate())
+
+            # 8bit is unsigned in wav files
+            if wf.getsampwidth() == 1:
+                device.setformat(alsaaudio.PCM_FORMAT_U8)
+            # Otherwise we assume signed data, little endian
+            elif wf.getsampwidth() == 2:
+                device.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+            elif wf.getsampwidth() == 3:
+                device.setformat(alsaaudio.PCM_FORMAT_S24_LE)
+            elif wf.getsampwidth() == 4:
+                device.setformat(alsaaudio.PCM_FORMAT_S32_LE)
+            else:
+                raise ValueError('Unsupported format')
+
+            device.setperiodsize(CHUNK)
+
+            data = wf.readframes(CHUNK)
+            while data != '' and self.stop is False:
+                device.write(data)
+                data = wf.readframes(CHUNK)
+
+        else:
+            # record
+            rate = 22050
+
+            wf = wave.open(self.filename + ".wav", 'wb')
+
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(rate)
+
+            device = alsaaudio.PCM(alsaaudio.PCM_CAPTURE)
+
+            device.setchannels(1)
+            device.setrate(rate)
+            device.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+
+            device.setperiodsize(CHUNK)
+
+            while self.stop is False:
+                l, data = device.read()
+                if l:
+                    wf.writeframes(data)
+
+        wf.close()
+        device.close()
+        log.debug("Exiting audio thread: " + self.filename)
 
 
 control = AudioControl()
